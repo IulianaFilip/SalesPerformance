@@ -9,12 +9,11 @@ st.text_input("Enter your name")
 
 
 quarter = st.selectbox("Select a quarter", ["Q1", "Q2", "Q3"])
-metric_calculation = st.selectbox("Select sales metric calcutation", ["Revenue", "Unit sold", "Conversion rate"])
+metric_calculation = st.selectbox("Select sales metric calculation", ["Revenue", "Unit sold", "Conversion rate"])
 individual_performance = st.selectbox("Select individual performance tracking", ["Sales targets", "Achived sales", "Conversion rate"])
 team_performance = st.selectbox("Select team performance tracking", ["Team targets", "Overall revenue", "Conversion rate"])
 customer_behavior = st.selectbox("Select customer behavior analysis", ["Patterns", "Trends", "segment customer"])
-#reports = st.text_area("Monthly report", "This is a report of the monthly sales of the company.")
-#targets = st.text_area("Target", "This is the target of the company.")
+
 
 if st.button("Submit"):
     st.write("Report submitted successfully.")
