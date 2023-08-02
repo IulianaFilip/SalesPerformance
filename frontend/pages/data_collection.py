@@ -5,7 +5,14 @@ import matplotlib.pyplot as plt
 API_URL = "http://localhost:8501/sales_app"
 
 st.markdown("# Data collection")
-st.text_input("Enter your name")
+if 'data' not in st.session_state:
+    st.session_state.data = {}  
+else:
+    st.write("Previous report:")
+    st.write(st.session_state.data)
+    
+  
+name  = st.text_input("Enter your name")
 
 
 quarter = st.selectbox("Select a quarter", ["Q1", "Q2", "Q3"])
@@ -19,7 +26,7 @@ if st.button("Submit"):
     st.write("Report submitted successfully.")
     
     data = {
-        
+        "name": name,
         "quarter": quarter,
         "metric_calculation": metric_calculation,
         "individual_performance": individual_performance,
@@ -29,6 +36,6 @@ if st.button("Submit"):
         
     }
 
-
+    st.session_state.data = data
 
 
