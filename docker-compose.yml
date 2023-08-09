@@ -7,7 +7,7 @@ services:
     ports:
       - "8000:8000"
     networks:
-      - #user-defined network bridge for all containers
+      #user-defined network bridge for all containers
       - frontend
       - backend
 
