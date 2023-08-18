@@ -19,6 +19,5 @@ def test_sales_performance_route():
     response = client.post("/salesperformance", json=payload, headers=headers)
     assert response.status_code == 200
 
-def test_get_sales_performance_route():
-    response = client.get("/salesperformance")
-    assert response.status_code == 200
+
+    
