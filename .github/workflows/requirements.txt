@@ -1,7 +1,0 @@
-streamlit 
-pandas 
-matplotlib 
-numpy 
-seaborn
-pytest-playwright
-selenium==4.11.0
