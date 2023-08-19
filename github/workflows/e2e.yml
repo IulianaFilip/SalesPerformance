@@ -1,0 +1,36 @@
+name: End-to-end tests
+
+on: [push]
+
+jobs:
+  tests_e2e:
+    name: Run end-to-end tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v3
+        with:
+          python-version: "3.9"
+      - run: 
+              venv/Scripts activate
+      
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          source activate SalesPerformance-frontend
+          playwright install chromium
+          docker compose build
+      - name: Run application
+        run: |
+          docker compose build
+          docker compose up -d
+          sleep 10
+          souce activate SalesPerformance-frontend
+          pytest test_end_to_end/test_frontend.py
+
+      - name: Upload Image Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: image-artifact
+          path: screenshot.png
