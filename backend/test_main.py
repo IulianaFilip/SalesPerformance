@@ -1,13 +1,10 @@
 from app.main import app, SalesPerformance
 from fastapi.testclient import TestClient
 import pytest
-from sqlmodel import Session, engine
+
 client = TestClient(app)
 
-@pytest.fixture
-def test_db_session():
-    with Session(engine) as session:
-        yield session
+
 
 def test_sales_performance_route():
     payload = {
