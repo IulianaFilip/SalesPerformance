@@ -7,30 +7,34 @@ jobs:
     name: Run end-to-end tests
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v2
       
       - name: Set up Python 3.9
         uses: actions/setup-python@v2
         with:
-          python-version: "3.9"
+          python-version: "3.9.0"
       
       - name: Activate virtual environment
         run: |
           python -m venv venv
           source venv/bin/activate
-      
-      - name: Install dependencies
+          
+      - name: Install Python dependencies
         run: |
-          python -m pip install --upgrade pip
-          pip install -r frontend/requirements.txt
           source venv/bin/activate
+          pip install --upgrade pip
+          pip install -r frontend/requirements.txt
           pip install playwright
           playwright install chromium
+      
+      - name: Build Docker containers
+        run: |
           docker-compose build
           
-      - name: Run application
+      - name: Run application and tests
         run: |
           docker-compose up -d
           sleep 10
           source venv/bin/activate
+          uvicorn  app.main:app --host 0.0.0.0 --port 8000 --reload &
           pytest test_end_to_end/test_frontend.py
