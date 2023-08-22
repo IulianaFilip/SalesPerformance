@@ -36,5 +36,11 @@ jobs:
           docker-compose up -d
           sleep 10
           source venv/bin/activate
-          uvicorn  app.main:app --host 0.0.0.0 --port 8000 --reload &
           pytest test_end_to_end/test_frontend.py
+          name: End-to-end tests
+          
+      - name: Upload Image Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: image-artifact
+
