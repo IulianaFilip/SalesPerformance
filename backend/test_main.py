@@ -8,6 +8,10 @@ from app.main import app, get_session
 
 client = TestClient(app)
 
+
+sqlite_url = "sqlite:///:memory:"
+
+
 def test_sales_performance_route():
     payload = {
         "quarters": "Q1",
