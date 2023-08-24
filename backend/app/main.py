@@ -1,11 +1,12 @@
 from __future__ import annotations
 from fastapi import FastAPI, Depends, HTTPException
+
 from datetime import date
 from enum import Enum
-from sqlmodel import Field, Session, SQLModel, create_engine, select
-from pydantic import BaseModel
-from typing import Optional
 
+from sqlmodel import Field, Session, SQLModel, create_engine, select
+
+from typing import Optional
 from typing import List
 
 sql_file_name = "database.db"
@@ -28,42 +29,29 @@ class SeeReport(SQLModel):
     individual_performance: str
     team_performance: str
     customer_behavior: str
-
-
-class AddChange(SQLModel):
-    quarters: str
     category: str
     subcategory: str
+    
+    
+class SalesReport(SeeReport, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+    
+
+    
+class ChangeCreate(SeeReport):
+    pass
+
+
+class AddChange(SQLModel, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+    report_id: int = Field(foreign_key="salesreport.id")
     change_made: str
     report_made: str
     output: str
     status: Status = Status.Open
     created_at: date = date.today()
-
-
-class ChangeCreate(AddChange):
-    pass
-
-
-class ChangeRead(AddChange):
-    id: int
-
-
+ 
     
-class SalesPerformance(SQLModel, table=True):
-    
-
-    id: Optional[int] = Field(default=None, primary_key=True)
-    quarters: str
-    category: str
-    subcategory: str
-    change_made: str
-    report_made: str
-    output: str
-
-
-class Config:
-    orm_mode = True
 
 
 app = FastAPI()
@@ -82,23 +70,31 @@ def get_session():
 def on_startup():
     create_db_and_tables()
 
-@app.get("/salesperformance", response_model=List[SalesPerformance])
+@app.get("/salesperformance", response_model=List[SalesReport])
 async def get_report(*, session: Session = Depends(get_session)):
-    sales_performance = session.query(SalesPerformance).all()
+    sales_performance = session.exec(select(SalesReport)).all()
     return sales_performance
-  
+ 
+ 
+@app.get("/salesperformance/{report_id}/changes", response_model=List[AddChange])
+async def get_changes_for_report(report_id: int, session: Session = Depends(get_session)):
+    changes = session.exec(select(AddChange).where(AddChange.report_id == report_id)).all()
+    return changes
+ 
 
-@app.post("/salesperformance", response_model=SalesPerformance)
-async def sales_performance(sales_data: SalesPerformance, session: Session = Depends(get_session)):
-    sales_performance_entry = SalesPerformance(
-        quarters=sales_data.quarters,
-        category=sales_data.category,
-        subcategory=sales_data.subcategory,
-        change_made=sales_data.change_made,
-        report_made=sales_data.report_made,
-        output=sales_data.output
-    )
-    session.add(sales_performance_entry)
+@app.post("/salesperformance", response_model=SalesReport)
+async def create_report(*, sales_performance: ChangeCreate, session: Session = Depends(get_session)):
+    db_sales = SalesReport.from_orm(sales_performance)
+    session.add(db_sales)
     session.commit()
-    return sales_performance_entry
+    session.refresh(db_sales)
+    return db_sales
 
+@app.post("/salesperformance/{report_id}/change", response_model=AddChange)
+async def create_change(report_id: int, change: AddChange, session: Session = Depends(get_session)):
+    db_change = AddChange.from_orm(change)
+    db_change.report_id = report_id
+    session.add(db_change)
+    session.commit()
+    session.refresh(db_change)
+    return db_change

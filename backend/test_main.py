@@ -1,45 +1,56 @@
-from app.main import app, SalesPerformance
-from fastapi.testclient import TestClient
 import pytest
+from fastapi.testclient import TestClient
+
+from sqlmodel import Session, SQLModel, create_engine
+from sqlmodel.pool import StaticPool
+
+from app.main import app, get_session
 
 client = TestClient(app)
 
-
-
-@pytest.fixture
-def valid_payload():
-    return {
+def test_sales_performance_route():
+    payload = {
         "quarters": "Q1",
         "category": "Revenue",
         "subcategory": "Sales Target",
         "change_made": "Team Targets",
         "report_made": "Sales Targets",
         "output": "Sales Targets",
+        "name" : "Julie",
+        "metric_calculations": "Sales Targets",
+        "individual_performance": "Sales Targets",
+        "team_performance": "Sales Targets",
+        "customer_behavior": "Sales Targets",
+        
     }
-
-def test_sales_performance_route(valid_payload):
     headers = {
-        "Content-Type": "application/json"
-    }
-    response = client.post("/salesperformance", json=valid_payload, headers=headers)
-    
-    assert response.status_code == 200
-    assert "id" in response.json() 
+    "Content-Type": "application/json"
+}
+    response = client.post("/salesperformance", json=payload, headers=headers)
+    print(response.json())
 
-def test_sales_performance_get():
+    assert response.status_code == 200
+
+
+def test_get_sales_performance():
     response = client.get("/salesperformance")
-    
     assert response.status_code == 200
-    assert isinstance(response.json(), list)  
-   
-
-
-
-   
+    assert isinstance(response.json(), list)
 
     
         
-      
+def test_sales_performance_route_invalid_data():
+    payload = {
+        # Missing "quarters", "category", and other fields
+        "change_made": "Team Targets",
+        "report_made": "Sales Targets",
+    }
+    headers = {
+        "Content-Type": "application/json"
+    }
+    response = client.post("/salesperformance", json=payload, headers=headers)
+    assert response.status_code == 422  # 422 Unprocessable Entity
+
 
 
 
