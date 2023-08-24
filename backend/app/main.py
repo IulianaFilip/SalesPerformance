@@ -84,16 +84,21 @@ def on_startup():
 
 @app.get("/salesperformance", response_model=List[SalesPerformance])
 async def get_report(*, session: Session = Depends(get_session)):
-    sales_performance = session.exec(select(SalesPerformance)).all()
+    sales_performance = session.query(SalesPerformance).all()
     return sales_performance
-
-
+  
 
 @app.post("/salesperformance", response_model=SalesPerformance)
-async def sales_performance(sales_data: SalesPerformance):
-    with Session(engine) as session:
-        sales_performance = SalesPerformance(**sales_data.dict())
-        session.add(sales_performance)
-        session.commit()
-        session.refresh(sales_performance)
-        return sales_performance
+async def sales_performance(sales_data: SalesPerformance, session: Session = Depends(get_session)):
+    sales_performance_entry = SalesPerformance(
+        quarters=sales_data.quarters,
+        category=sales_data.category,
+        subcategory=sales_data.subcategory,
+        change_made=sales_data.change_made,
+        report_made=sales_data.report_made,
+        output=sales_data.output
+    )
+    session.add(sales_performance_entry)
+    session.commit()
+    return sales_performance_entry
+
