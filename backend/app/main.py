@@ -33,7 +33,7 @@ class SeeReport(SQLModel):
     subcategory: str
     
     
-class SalesReport(SeeReport, table=True):
+class SalesPerformance(SeeReport, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     
 
@@ -70,9 +70,9 @@ def get_session():
 def on_startup():
     create_db_and_tables()
 
-@app.get("/salesperformance", response_model=List[SalesReport])
+@app.get("/salesperformance", response_model=List[SalesPerformance])
 async def get_report(*, session: Session = Depends(get_session)):
-    sales_performance = session.exec(select(SalesReport)).all()
+    sales_performance = session.exec(select(SalesPerformance)).all()
     return sales_performance
  
  
@@ -82,9 +82,9 @@ async def get_changes_for_report(report_id: int, session: Session = Depends(get_
     return changes
  
 
-@app.post("/salesperformance", response_model=SalesReport)
+@app.post("/salesperformance", response_model=SalesPerformance)
 async def create_report(*, sales_performance: ChangeCreate, session: Session = Depends(get_session)):
-    db_sales = SalesReport.from_orm(sales_performance)
+    db_sales = SalesPerformance.from_orm(sales_performance)
     session.add(db_sales)
     session.commit()
     session.refresh(db_sales)
