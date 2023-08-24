@@ -44,7 +44,7 @@ class ChangeCreate(SeeReport):
 
 class AddChange(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
-    report_id: int = Field(foreign_key="salesreport.id")
+    report_id: int = Field(foreign_key="salesperformance.id")
     change_made: str
     report_made: str
     output: str
