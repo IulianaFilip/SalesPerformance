@@ -4,12 +4,13 @@ from fastapi.testclient import TestClient
 from sqlmodel import Session, SQLModel, create_engine
 from sqlmodel.pool import StaticPool
 
-from app.main import app, get_session
+from app.main import app, create_db_and_tables
 
 client = TestClient(app)
 
+def setup_module(module):
+    create_db_and_tables()
 
-sqlite_url = "sqlite:///:memory:"
 
 
 def test_sales_performance_route():

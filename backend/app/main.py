@@ -35,7 +35,9 @@ class SeeReport(SQLModel):
     
 class SalesPerformance(SeeReport, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
-    
+
+    class Config:
+        table_name = "salesperformance"
 
     
 class ChangeCreate(SeeReport):
@@ -63,7 +65,9 @@ def create_db_and_tables():
 
 def get_session():
     with Session(engine) as session:
+        session.execute("PRAGMA foreign_keys=ON")
         yield session
+
 
 
 @app.on_event("startup")
