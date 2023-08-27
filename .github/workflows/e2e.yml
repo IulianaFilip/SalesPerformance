@@ -1,0 +1,47 @@
+name: End-to-end tests
+
+on: [push]
+
+jobs:
+  tests_e2e:
+    name: Run end-to-end tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.9"
+      
+      - name: Activate virtual environment
+        run: |
+          python -m venv venv
+          source venv/bin/activate
+          
+      - name: Install Python dependencies
+        run: |
+          source venv/bin/activate
+          pip install --upgrade pip
+          pip install -r frontend/requirements.txt
+          pip install playwright
+          playwright install chromium
+      
+      - name: Build Docker containers
+        run: |
+          docker-compose build
+          
+      - name: Run application and tests
+        run: |
+          docker-compose up -d
+          sleep 10
+          source venv/bin/activate
+          pytest test_end_to_end/test_frontend.py
+          
+          
+      - name: Upload Image Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: image-artifact
+          path: screenshot.png
+
