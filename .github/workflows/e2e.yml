@@ -37,10 +37,11 @@ jobs:
           sleep 10
           source venv/bin/activate
           pytest test_end_to_end/test_frontend.py
-          name: End-to-end tests
+          
           
       - name: Upload Image Artifact
         uses: actions/upload-artifact@v2
         with:
           name: image-artifact
+          path: screenshot.png
 
